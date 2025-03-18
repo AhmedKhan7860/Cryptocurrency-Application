@@ -78,6 +78,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: "Account",
+          tabBarIcon: ({ color }) => (
+            <User size={24} color={color} strokeWidth={1.5} />
+          ),
+        }}
+        />
       
     </Tabs>
   );
