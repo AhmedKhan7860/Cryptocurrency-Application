@@ -11,6 +11,7 @@ import {
   ScrollIcon,
   SearchIcon,
   WalletIcon,
+  User
 } from "lucide-react-native";
 
 export default function TabLayout() {
@@ -77,6 +78,7 @@ export default function TabLayout() {
           ),
         }}
       />
+      
     </Tabs>
   );
 }
