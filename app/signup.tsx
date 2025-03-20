@@ -15,7 +15,6 @@ export default function SignupScreen() {
 
     const navigation = useNavigation();
 
-
     return(
         <SafeAreaView className="bg-black p-4">
             <View className="p-6 bg-black">
@@ -154,14 +153,8 @@ export default function SignupScreen() {
                         </Text>
                     </TouchableOpacity>
                 </View>
-
-
             </View>
-
         </SafeAreaView>
 
-
-
     )
-
 }
