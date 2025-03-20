@@ -10,7 +10,6 @@ export default function LoginScreen() {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const navigation = useNavigation();
-    
 
     return(
     <SafeAreaView className="bg-black p-4">
