@@ -1,15 +1,42 @@
 import React, { useState } from "react";
-import { TextInput, TouchableOpacity, SafeAreaView, Image } from "react-native";
+import { TextInput, TouchableOpacity, SafeAreaView, Image, Alert } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { View, Text } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useSignIn } from "@clerk/clerk-expo";
+import { useRouter } from "expo-router";
 
 
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const navigation = useNavigation();
+
+    const { signIn, setActive, isLoaded } = useSignIn();
+    const [loading, setLoading] = useState(false);
+
+    const router = useRouter();
+    
+    
+    const SignInPress = async () => {
+        if(!isLoaded){
+            Alert.alert("Error", "Clerk is not loaded.")
+            return;
+        }
+        setLoading(true);
+
+        try{
+            const completeSignIn = await signIn.create({
+                identifier: email,
+                password,
+            });
+
+            await setActive({ session: completeSignIn.createdSessionId });
+        }catch(error: any){
+            Alert.alert("Error", error.errors[0].message);
+        }finally{
+            setLoading(false);
+        }
+    };
 
     return(
     <SafeAreaView className="bg-black p-4">
@@ -62,14 +89,14 @@ export default function LoginScreen() {
             </View>
 
             {/* Forgot Password */}
-            <TouchableOpacity className="items-center mb-6">
+            <TouchableOpacity className="items-center mb-6" onPress={() => router.replace('/(tabs)/reset')}>
                 <Text className="text-[16px] text-white font-bold mt-5">
                     Forgot password?
                 </Text>
             </TouchableOpacity>
 
             {/* Login Button */}
-            <TouchableOpacity className="bg-purple-300 rounded-full h-14 justify-center items-center mb-6">
+            <TouchableOpacity className="bg-purple-300 rounded-full h-14 justify-center items-center mb-6" onPress={SignInPress}>
                 <Text className="text-base font-bold text-background">
                     Login
                 </Text>
@@ -103,7 +130,7 @@ export default function LoginScreen() {
 
             {/* Create Account Link */}
            <View className="mb-8 mt-3 items-center">
-                <TouchableOpacity onPress={() => navigation.navigate('signup')}>
+                <TouchableOpacity onPress={() =>  router.replace('/(public)/sign-up')}>
                     <Text className="text-white">
                         Don't have an account? {""}
                         <Text className="text-purple-300 font-bold">Create account</Text>

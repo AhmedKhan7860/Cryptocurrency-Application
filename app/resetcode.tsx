@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TextInput, TouchableOpacity, SafeAreaView, Image, Alert, View, Text } from "react-native";
 import { useRouter } from "expo-router";
+import { useAuth, useSignIn } from "@clerk/clerk-expo";
 import { Feather } from "@expo/vector-icons";
 
 
@@ -9,6 +10,25 @@ export default function ResetCodeScreen() {
     const [password, setPassword] = useState("");
     const [code, setCode] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const { signIn, setActive } = useSignIn();
+    
+
+    const onReset = async () => {
+            try{
+                const result = await signIn.attemptFirstFactor({
+                    strategy: 'reset_password_email_code',
+                    code,
+                    password,
+                });
+                console.log(result)
+                alert('Password reset successfully')
+    
+                await setActive({ session: result.createdSessionId })
+            }catch(error: any){
+                Alert.alert("Error", error.errors[0].message);
+            }
+        }
+    
 
     return(
         <SafeAreaView className="bg-black h-[100%]">
@@ -54,10 +74,11 @@ export default function ResetCodeScreen() {
                 </View>
             </View>
 
-            <TouchableOpacity className="items-center">
+            <TouchableOpacity className="items-center" onPress={onReset}>
                 <Text className="text-purple-300 font-bold mt-7">Set New Password</Text>
             </TouchableOpacity>
-        
+            
+
         </SafeAreaView>
     )
 }
