@@ -1,110 +1,226 @@
-import * as React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Alert,
+} from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from "react";
 import { useSignUp } from "@clerk/clerk-expo";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
-export default function SignUpScreen() {
-  const { isLoaded, signUp, setActive } = useSignUp();
+export default function SignupScreen() {
+  const [firstname, setFirstName] = useState("");
+  const [lastname, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailAddress, setEmailAddress] = useState("");
   const router = useRouter();
 
-  const [emailAddress, setEmailAddress] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [pendingVerification, setPendingVerification] = React.useState(false);
-  const [code, setCode] = React.useState("");
+  const { signUp, isLoaded, setActive } = useSignUp();
+  const [loading, setLoading] = useState(false);
 
-  // Handle submission of sign-up form
-  const onSignUpPress = async () => {
-    if (!isLoaded) return;
+  // create user and send the verification email
+  const SignupPress = async () => {
+    if (!isLoaded) {
+      Alert.alert("Error", "Clerk is not loaded.");
+      return;
+    }
+    setLoading(true);
 
-    // Start sign-up process using email and password provided
     try {
-      await signUp.create({
+      if (!emailAddress) {
+        Alert.alert("Error", "Email address is required");
+        return;
+      }
+      // create user on clerk
+      const result = await signUp.create({
         emailAddress,
         password,
+        firstName: firstname,
+        lastName: lastname,
+        username: username,
       });
 
-      // Send user an email with verification code
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      console.log("Sign-up response:", result);
 
-      // Set 'pendingVerification' to true to display second form
-      // and capture OTP code
-      setPendingVerification(true);
-    } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
-
-  // Handle submission of verification form
-  const onVerifyPress = async () => {
-    if (!isLoaded) return;
-
-    try {
-      // Use the code the user provided to attempt verification
-      const signUpAttempt = await signUp.attemptEmailAddressVerification({
-        code,
-      });
-
-      // If verification was completed, set the session to active
-      // and redirect the user
-      if (signUpAttempt.status === "complete") {
-        await setActive({ session: signUpAttempt.createdSessionId });
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
         router.replace("/");
+      } else if (result.status === "missing_requirements") {
+        // Prepare email verification
+        await signUp.prepareEmailAddressVerification({
+          strategy: "email_code",
+        });
+
+        // Navigate to the verification screen
+        router.replace("/(auth)/verification");
       } else {
-        // If the status is not complete, check why. User may need to
-        // complete further steps.
-        console.error(JSON.stringify(signUpAttempt, null, 2));
+        Alert.alert("Error", "Sign Up process is incomplete");
       }
-    } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
+    } catch (error: any) {
+      Alert.alert("Error", error.errors[0].message);
+    } finally {
+      setLoading(false);
     }
   };
-
-  if (pendingVerification) {
-    return (
-      <>
-        <Text>Verify your email</Text>
-        <TextInput
-          value={code}
-          placeholder="Enter your verification code"
-          onChangeText={(code) => setCode(code)}
-        />
-        <TouchableOpacity onPress={onVerifyPress}>
-          <Text>Verify</Text>
-        </TouchableOpacity>
-      </>
-    );
-  }
 
   return (
-    <View>
-      <>
-        <Text>Sign up</Text>
-        <TextInput
-          autoCapitalize="none"
-          value={emailAddress}
-          placeholder="Enter email"
-          onChangeText={(email) => setEmailAddress(email)}
-        />
-        <TextInput
-          value={password}
-          placeholder="Enter password"
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
-        <TouchableOpacity onPress={onSignUpPress}>
-          <Text>Continue</Text>
-        </TouchableOpacity>
-        <View style={{ display: "flex", flexDirection: "row", gap: 3 }}>
-          <Text>Already have an account?</Text>
-          <Link href="/sign-in">
-            <Text>Sign in</Text>
-          </Link>
+    <SafeAreaView className="bg-black p-4">
+      <View className="-mt-12 mb-0 bg-black p-6">
+        {/* Header */}
+        <View className="mb-17 items-center">
+          <Text className="text-[25px] font-bold text-white">
+            Create your account
+          </Text>
+          <Text className="mb-8 mt-3 text-[12px] text-gray-300">
+            Welcome back! Please fill in the details to get started.
+          </Text>
         </View>
-      </>
-    </View>
+
+        {/*  Social Logup Buttons  */}
+        <View className="mb-7 flex-row items-center gap-7">
+          <TouchableOpacity
+            className="mb-4 h-[35px] w-[150px] flex-row items-center justify-center rounded-md bg-[rgb(52,52,52)]"
+            onPress={() => {}}
+          >
+            <Image
+              source={{
+                uri: "https://img.icons8.com/?size=100&id=17950&format=png&color=ffffff",
+              }}
+              className="mr-3 h-5 w-5"
+            />
+            <Text className="text-white">Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity className="mb-4 h-[35px] w-[150px] flex-row items-center justify-center rounded-md bg-[rgb(52,52,52)]">
+            <Image
+              source={{
+                uri: "https://img.icons8.com/?size=100&id=30840&format=png&color=ffffff",
+              }}
+              className="mr-3 h-5 w-5"
+            />
+            <Text className="text-white">Apple</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Divider */}
+        <View className="-mt-4 mb-0 flex-row items-center">
+          <View className="h-[1px] flex-1 bg-gray-500" />
+          <Text className="mx-4 text-center text-[16px] text-gray-400">OR</Text>
+          <View className="h-[1px] flex-1 bg-gray-500" />
+        </View>
+
+        {/* Firstname/Surname Input */}
+        <View className="-mt-2 mb-0 flex-row">
+          <View className="mt-4 flex-1 flex-col p-4">
+            <Text className="text-white">First Name</Text>
+            <View className="bg-surfare mt-4 h-11 flex-row items-center rounded-md border-2 border-gray-600 p-2">
+              <TextInput
+                className="flex-1 text-white "
+                placeholderTextColor="#666"
+                value={firstname}
+                onChangeText={setFirstName}
+                keyboardType="default"
+                autoCapitalize="words"
+              />
+            </View>
+          </View>
+
+          <View className="mt-4 flex-1 flex-col p-4">
+            <Text className="text-white">Last Name</Text>
+            <View className="bg-surfare mt-4 h-11 flex-row items-center rounded-md border-2 border-gray-600 p-2">
+              <TextInput
+                className="flex-1 text-white"
+                placeholderTextColor="#666"
+                value={lastname}
+                onChangeText={setLastName}
+                keyboardType="default"
+                autoCapitalize="words"
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Username Input */}
+        <View className="-mt-1 mb-0 p-4">
+          <Text className="text-white">Username</Text>
+          <View className="bg-surfare mt-4 h-11 flex-row items-center rounded-md border-2 border-gray-600 p-2">
+            <TextInput
+              className="flex-1 text-white"
+              placeholderTextColor="#666"
+              value={username}
+              onChangeText={setUsername}
+              keyboardType="default"
+              autoCapitalize="words"
+            />
+          </View>
+        </View>
+
+        {/* Email Input */}
+        <View className="p-4">
+          <Text className="text-white">Email</Text>
+          <View className="bg-surfare mt-4 h-11 flex-row items-center rounded-md border-2 border-gray-600 p-2">
+            <TextInput
+              className="flex-1 text-white"
+              placeholderTextColor="#666"
+              value={emailAddress}
+              onChangeText={setEmailAddress}
+              keyboardType="default"
+              autoCapitalize="none"
+            />
+          </View>
+        </View>
+
+        {/* Password */}
+        <View className="mb-9 p-4">
+          <Text className="text-white">Password</Text>
+          <View className="bg-surfare mt-4 h-11 flex-row items-center rounded-md border-2 border-gray-600 p-2">
+            <TextInput
+              className="flex-1 text-white"
+              placeholderTextColor="#666"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              className="p-1"
+            >
+              <Feather
+                name={showPassword ? "eye" : "eye-off"}
+                size={15}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Sign Up Button */}
+        <TouchableOpacity
+          className="-mt-2 mb-5 h-14 items-center justify-center rounded-full bg-purple-300"
+          onPress={SignupPress}
+          disabled={loading}
+        >
+          <Text className="text-background text-base font-bold">
+            {loading ? "Loading..." : "Sign Up"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Message */}
+        <View className="items-center">
+          <TouchableOpacity onPress={() => router.replace("/(auth)/sign-in")}>
+            <Text className="text-white">
+              Already have an account?{" "}
+              <Text className="font-bold text-purple-300">Sign in</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }

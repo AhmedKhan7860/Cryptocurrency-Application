@@ -1,14 +1,7 @@
-import { Redirect, Stack } from "expo-router";
-import { useAuth } from "@clerk/clerk-expo";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Stack } from "expo-router";
 
 export default function AuthRoutesLayout() {
-  const { isSignedIn } = useAuth();
-
-  if (isSignedIn) {
-    return <Redirect href={"/"} />;
-  }
-
   const colorScheme = useColorScheme();
 
   return (
