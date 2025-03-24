@@ -2,12 +2,33 @@
 import React, { useState } from "react";
 import { TextInput, TouchableOpacity, SafeAreaView, Image, Alert, View, Text } from "react-native";
 import { useRouter } from "expo-router";
+import { useAuth, useSignIn } from "@clerk/clerk-expo";
+
 
 export default function ResetScreen() {
     const [email, setEmail] = useState("");
     const router = useRouter();
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
+    const { signIn } = useSignIn();
+    const { signOut } = useAuth(); 
+    
+    const resetRequest = async () => {
+        try{
+            await signOut();
+
+            await signIn.create({
+                strategy: 'reset_password_email_code',
+                identifier: email,
+            });
+
+            router.replace('/resetcode')
+        }catch(error: any){
+            Alert.alert("Error", error.errors[0].message);
+        }
+    };
+
 
     return(
         <SafeAreaView className="bg-black h-[100%]">
