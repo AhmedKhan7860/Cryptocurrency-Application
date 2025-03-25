@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextInput, TouchableOpacity, SafeAreaView, Image, Alert } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { View, Text } from "react-native";
-import { useSignIn } from "@clerk/clerk-expo";
+import { useSignIn, useSSO } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 
+import * as WebBrowser from 'expo-web-browser'
+import * as AuthSession from 'expo-auth-session'
 
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
@@ -37,6 +39,42 @@ export default function LoginScreen() {
             setLoading(false);
         }
     };
+
+    const useWarmUpBrowser = () => {
+        useEffect(() => {
+          void WebBrowser.warmUpAsync()
+          return () => {
+            void WebBrowser.coolDownAsync()
+          }
+        }, [])
+      };
+
+    WebBrowser.maybeCompleteAuthSession();
+    useWarmUpBrowser();
+
+    const { startSSOFlow } = useSSO();
+
+    const handleOAuth = async (strategy: 'oauth_google' | 'oauth_apple') => {
+        try{
+            const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({
+                strategy,
+                redirectUrl: AuthSession.makeRedirectUri(),
+            })
+
+            if(createdSessionId){
+               await setActive!({ session: createdSessionId })
+            }else{
+                if(signIn){
+                    Alert.alert("Error", "Additional requirements needed")
+                }else if(signUp){
+                    Alert.alert("Error", "Complete registration")
+                }
+            }
+        }catch(error: any){
+            Alert.alert("Error", "OAuth error");
+    }
+}
+
 
     return(
     <SafeAreaView className="bg-black p-4">
@@ -108,7 +146,7 @@ export default function LoginScreen() {
             </Text>
 
             {/* Social Login Buttons */}
-            <TouchableOpacity className="flex-row items-center justify-center rounded-full h-14 mb-4 bg-[rgb(52,52,52)]">
+            <TouchableOpacity className="flex-row items-center justify-center rounded-full h-14 mb-4 bg-[rgb(52,52,52)]" onPress={() => handleOAuth('oauth_google')}>
                 <Image
                     source={{ uri: "https://www.google.com/favicon.ico" }}
                     className="w-5 h-5 mr-3"
@@ -118,7 +156,7 @@ export default function LoginScreen() {
                 </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity className="flex-row items-center justify-center rounded-full h-14 mb-4 bg-[rgb(52,52,52)]">
+            <TouchableOpacity className="flex-row items-center justify-center rounded-full h-14 mb-4 bg-[rgb(52,52,52)]" onPress={() => handleOAuth('oauth_apple')}>
             <Image
                     source={{ uri: "https://img.icons8.com/?size=100&id=30840&format=png&color=ffffff" }}
                     className="w-5 h-5 mr-3"
