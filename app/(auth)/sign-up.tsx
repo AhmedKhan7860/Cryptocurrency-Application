@@ -9,7 +9,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
-import { useSignUp } from "@clerk/clerk-expo";
+import { useSignUp, useSSO } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 
 export default function SignupScreen() {
@@ -69,6 +69,36 @@ export default function SignupScreen() {
     }
   };
 
+
+  const { startSSOFlow} = useSSO();
+
+  const onAuthPress = async (strategy: 'oauth_google' | 'oauth_apple') => {
+      if(!isLoaded){
+          Alert.alert("Error", "Clerk is not loaded.")
+          return;
+      }
+      setLoading(true);
+
+      try{
+          const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({strategy})
+      
+          if(createdSessionId){
+              await setActive!({ session: createdSessionId })
+              router.replace('/(tabs)')
+          }else{
+              router.replace({
+                  pathname: '/(auth)/complete-signup',
+                  params: {emailAddress}
+              })
+          }
+     }catch(error: any){
+      Alert.alert("Error", error.errors[0].message);
+      }finally{
+          setLoading(false);
+      }
+  }
+
+
   return (
     <SafeAreaView className="bg-black p-4">
       <View className="-mt-12 mb-0 bg-black p-6">
@@ -86,7 +116,7 @@ export default function SignupScreen() {
         <View className="mb-7 flex-row items-center gap-7">
           <TouchableOpacity
             className="mb-4 h-[35px] w-[150px] flex-row items-center justify-center rounded-md bg-[rgb(52,52,52)]"
-            onPress={() => {}}
+            onPress={() => onAuthPress('oauth_google')}
           >
             <Image
               source={{
@@ -97,7 +127,7 @@ export default function SignupScreen() {
             <Text className="text-white">Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="mb-4 h-[35px] w-[150px] flex-row items-center justify-center rounded-md bg-[rgb(52,52,52)]">
+          <TouchableOpacity className="mb-4 h-[35px] w-[150px] flex-row items-center justify-center rounded-md bg-[rgb(52,52,52)]" onPress={() => onAuthPress('oauth_apple')}>
             <Image
               source={{
                 uri: "https://img.icons8.com/?size=100&id=30840&format=png&color=ffffff",
