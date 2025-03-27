@@ -17,7 +17,6 @@ export default function VerifyEmailScreen() {
         return;
       }
 
-      // Attempt to verify the email address
       const result = await signUp.attemptEmailAddressVerification({ code });
 
       console.log("Verification result:", result);
@@ -27,21 +26,14 @@ export default function VerifyEmailScreen() {
 
         await signOut();
 
-        // Email verification is complete, activate the session
         await setActive({ session: result.createdSessionId });
 
-        console.log("navigating to home page");
-        // Navigate to the home screen`
         router.replace("/");
       } else {
-        // Handle incomplete verification
         Alert.alert("Error", "Email verification is incomplete.");
       }
     } catch (error: any) {
-      // Log the error for debugging
-      console.error("Verification error:", error);
 
-      // Display a user-friendly error message
       Alert.alert(
         "Error",
         error.errors
@@ -57,7 +49,7 @@ export default function VerifyEmailScreen() {
         Enter the verification code sent to your email
       </Text>
       <TextInput
-        className="w-full h-12 bg-gray-800 text-white rounded-md px-4 mb-4"
+        className="w-full flex-row items-center bg-surfare p-2 mt-4 h-11 border-2 border-gray-600 text-white rounded-md px-4 mb-4"
         placeholder="Verification code"
         placeholderTextColor="#666"
         value={code}
