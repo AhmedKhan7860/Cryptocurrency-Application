@@ -14,7 +14,6 @@ import {
   User,
 } from "lucide-react-native";
 import { SignedIn, SignedOut } from "@clerk/clerk-expo";
-import * as Linking from "expo-linking";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();

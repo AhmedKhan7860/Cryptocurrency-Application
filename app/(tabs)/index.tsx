@@ -27,6 +27,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 
+const router = useRouter();
+
 // Define TypeScript types
 type ActionButtonProps = {
   icon: React.ReactNode;
@@ -227,7 +229,7 @@ export default function HomeScreen() {
         <ActionButton
           icon={
             <ArrowRightLeftIcon
-              size={24}
+              size={44}
               strokeWidth={1.5}
               color={Colors[colorScheme ?? "light"].tint}
             />
