@@ -24,6 +24,7 @@ import {
   StarIcon,
 } from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
+import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 
 const router = useRouter();
@@ -131,6 +132,8 @@ const TagButton = ({ children, active, color }: TagButtonProps) => (
 // HomeScreen Component
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
+  const { user } = useUser();
+  const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-black">
@@ -159,10 +162,13 @@ export default function HomeScreen() {
               color={Colors[colorScheme ?? "light"].tint}
             />
           </TouchableOpacity>
-          <TouchableOpacity className="w-10 h-10 justify-center items-center aspect-square rounded-full overflow-hidden ml-1">
+          <TouchableOpacity
+            className="w-10 h-10 justify-center items-center aspect-square rounded-full overflow-hidden ml-1"
+            onPress={() => router.replace("/(settings)/account")}
+          >
             <Image
               source={{
-                uri: "https://media.licdn.com/dms/image/v2/C4D0BAQGOMVo5-P5IHg/company-logo_100_100/company-logo_100_100/0/1674468940363/wedancevip_logo?e=1746057600&v=beta&t=-0H2axc1cf1cYv2q4jdwUyC6I09d8hH84rjb-3fGOM4",
+                uri: user?.imageUrl,
               }}
               className="w-full h-full"
             />
