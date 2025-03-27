@@ -35,6 +35,8 @@ export default function LoginScreen() {
       });
 
       await setActive({ session: completeSignIn.createdSessionId });
+
+      router.replace("/");
     } catch (error: any) {
       Alert.alert("Error", error.errors[0].message);
     } finally {
