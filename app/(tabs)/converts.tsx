@@ -1,4 +1,4 @@
-import {  View, Text, TextInput, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {  View, Text, TextInput, Modal, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useState } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
@@ -6,29 +6,10 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 export default function ConvertScreen(){
   const [usdtAmount, setUsdtAmount] = useState('1,000');
   const [btcAmount, setBtcAmount] = useState('0.01061533');
+  const [isModalVisible, setModalVisible] = useState(false);
 
   // Mock conversion rate (you can replace this with an API call)
   const conversionRate = 101810.47;
-
-  // Function to handle keypad input
-  const handleKeypadPress = (value: string) => {
-    setUsdtAmount((prev) => {
-      let newAmount = prev;
-  
-      if (value === '⌫') {
-        newAmount = prev.slice(0, -1) || '0';
-      } else {
-        newAmount = prev === '0' ? value : prev + value;
-      }
-  
-      // Remove commas before converting
-      const usdtValue = parseFloat(newAmount.replace(/,/g, '')) || 0;
-      const btcValue = usdtValue / conversionRate;
-  
-      setBtcAmount(btcValue.toFixed(8).toString()); // Update BTC amount
-      return newAmount; // Update USDT amount
-    });
-  };
 
   return (
     <TouchableWithoutFeedback onPress={()=>{
@@ -94,10 +75,38 @@ export default function ConvertScreen(){
         <Text style={styles.rateText}>1 BTC = 101,810.47 USDT</Text>
 
         {/* Convert Button */}
-        <TouchableOpacity style={styles.convertButton}>
+        <TouchableOpacity style={styles.convertButton}
+        onPress={() => setModalVisible(true)}>
           <Text style={styles.convertButtonText}>Convert</Text>
           
         </TouchableOpacity>
+
+        {/* Confirmation Modal */}
+        <Modal transparent={true} visible={isModalVisible} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.title}>Confirmation</Text>
+
+              {/* USDT to BTC Conversion Info */}
+              <View style={styles.transactionBox}>
+                <Text style={styles.transactionText}>USDT {usdtAmount} → BTC {btcAmount}</Text>
+              </View>
+
+              {/* Transaction Details */}
+              <Text style={styles.details}>Type: Market</Text>
+              <Text style={styles.details}>Transaction Fees: Free</Text>
+              <Text style={styles.details}>Rate: 1 BTC = 100,035.0769 USDT</Text>
+
+              {/* Confirm Button with Countdown */}
+              <TouchableOpacity
+                style={[styles.confirmButton]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
       </View>
     </TouchableWithoutFeedback>
@@ -187,5 +196,13 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     marginLeft: 5,
   },
+  buttonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+  modalContent: { backgroundColor: '#333', padding: 20, borderRadius: 10, width: '80%', alignItems: 'center' },
+  title: { fontSize: 20, fontWeight: 'bold', color: 'white', marginBottom: 10 },
+  transactionBox: { backgroundColor: '#444', padding: 10, borderRadius: 8, marginBottom: 10 },
+  transactionText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+  details: { color: 'white', fontSize: 14, marginVertical: 2 },
+  confirmButton: { backgroundColor: 'purple', padding: 15, borderRadius: 10, marginTop: 15 },
 });
 
