@@ -12,6 +12,7 @@ import {
   SearchIcon,
   WalletIcon,
   User,
+  ArrowLeftRight
 } from "lucide-react-native";
 import { SignedIn, SignedOut } from "@clerk/clerk-expo";
 
@@ -87,6 +88,15 @@ export default function TabLayout() {
               title: "Account",
               tabBarIcon: ({ color }) => (
                 <User size={24} color={color} strokeWidth={1.5} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="converts"
+            options={{
+              title: "Convert",
+              tabBarIcon: ({ color }) => (
+                <ArrowLeftRight  size={24} color={color} strokeWidth={1.5} />
               ),
             }}
           />
