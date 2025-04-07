@@ -27,12 +27,13 @@ import { ThemedText } from "@/components/ThemedText";
 import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 
-const router = useRouter();
+// const router = useRouter();
 
 // Define TypeScript types
 type ActionButtonProps = {
   icon: React.ReactNode;
   label: string;
+  labelStyle?: string;
 };
 
 type CryptoItemProps = {
@@ -41,6 +42,7 @@ type CryptoItemProps = {
   symbol: string;
   price: string;
   change: number;
+  labelStyle?: string;
 };
 
 type TabButtonProps = {
@@ -57,17 +59,18 @@ type TagButtonProps = {
 };
 
 // ActionButton Component
-const ActionButton = ({ icon, label }: ActionButtonProps) => (
+const ActionButton = ({ icon, label, labelStyle }: ActionButtonProps) => (
   <TouchableOpacity className="items-center">
     <View className="w-16 h-16 bg-zinc-900 rounded-full items-center justify-center">
       {icon}
     </View>
-    <Text className="text-white mt-1 text-xs">{label}</Text>
+    <Text className="mt-1 text-xs" style={{color: labelStyle}}>{label}</Text>
+
   </TouchableOpacity>
 );
 
 // CryptoItem Component
-const CryptoItem = ({ icon, name, symbol, price, change }: CryptoItemProps) => (
+const CryptoItem = ({ icon, name, symbol, price, change, labelStyle }: CryptoItemProps) => (
   <TouchableOpacity className="flex-row items-center border-b py-4 border-zinc-900">
     {typeof icon === "string" ? (
       <Image
@@ -80,11 +83,11 @@ const CryptoItem = ({ icon, name, symbol, price, change }: CryptoItemProps) => (
       <Image source={icon} className="w-10 h-10 rounded-full" />
     )}
     <View className="flex-1 ml-3">
-      <Text className="text-white text-base font-medium">{name}</Text>
+      <Text className="text-base font-medium" style={{color: labelStyle}}>{name}</Text>
       <Text className="text-gray-600 text-sm">{symbol}</Text>
     </View>
     <View className="items-end">
-      <Text className="text-white text-base font-medium">{price}</Text>
+      <Text className="text-base font-medium" style={{color: labelStyle}}>{price}</Text>
       <View
         className={`px-1.5 py-1 rounded-full mt-1 ${
           change >= 0 ? "bg-green-900" : "bg-red-900"
@@ -131,12 +134,16 @@ const TagButton = ({ children, active, color }: TagButtonProps) => (
 
 // HomeScreen Component
 export default function HomeScreen() {
-  const colorScheme = useColorScheme();
+ 
+  
   const { user } = useUser();
   const router = useRouter();
 
+  const theme = useColorScheme();
+  const colorScheme = Colors[theme ?? 'light'] || Colors.light;
+
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colorScheme.background }}>
       <View className="flex-row justify-between items-center px-4 py-4">
         <View className="flex-row border border-zinc-900 rounded-full">
           <TabButton
@@ -152,14 +159,14 @@ export default function HomeScreen() {
             <GiftIcon
               size={18}
               strokeWidth={1.5}
-              color={Colors[colorScheme ?? "light"].tint}
+              color={colorScheme.tint}
             />
           </TouchableOpacity>
           <TouchableOpacity className="p-1">
             <MessageSquareIcon
               size={18}
               strokeWidth={1.5}
-              color={Colors[colorScheme ?? "light"].tint}
+              color={colorScheme.tint}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -178,12 +185,12 @@ export default function HomeScreen() {
       <View className="p-4">
         <Text className="text-zinc-500 text-base">Total Balance</Text>
         <View className="flex-row items-center gap-2">
-          <Text className="text-white text-3xl font-bold">$169,421.73</Text>
+          <Text className="text-3xl font-bold" style={{color: colorScheme.text}}>$169,421.73</Text>
           <Text className="text-xl">
             <EyeIcon
               size={18}
               strokeWidth={1.5}
-              color={Colors[colorScheme ?? "light"].tint}
+              color={colorScheme.tint}
             />
           </Text>
         </View>
@@ -201,40 +208,49 @@ export default function HomeScreen() {
             <PlusIcon
               size={24}
               strokeWidth={1.5}
-              color={Colors[colorScheme ?? "light"].tint}
+              color={colorScheme.tint}
             />
           }
           label="Add"
+          labelStyle = {colorScheme.text}
         />
         <ActionButton
           icon={
             <ArrowDownIcon
               size={24}
               strokeWidth={1.5}
-              color={Colors[colorScheme ?? "light"].tint}
+              color={colorScheme.tint}
+
             />
           }
           label="Send"
+          labelStyle = {colorScheme.text}
+
         />
         <ActionButton
           icon={
             <QrCodeIcon
               size={24}
               strokeWidth={1.5}
-              color={Colors[colorScheme ?? "light"].tint}
+              color={colorScheme.tint}
+
             />
           }
           label="Receive"
+          labelStyle = {colorScheme.text}
+
         />
         <ActionButton
           icon={
             <ArrowRightLeftIcon
               size={44}
               strokeWidth={1.5}
-              color={Colors[colorScheme ?? "light"].tint}
+              color={colorScheme.tint}
             />
           }
           label="Convert"
+          labelStyle = {colorScheme.text}
+
         />
       </View>
       <View className="flex-1 py-3">
@@ -281,6 +297,7 @@ export default function HomeScreen() {
             symbol="BTC"
             price="$101,810.47"
             change={5.36}
+            labelStyle = {colorScheme.text}
           />
           <CryptoItem
             icon="https://static-00.iconduck.com/assets.00/ethereum-cryptocurrency-icon-512x512-u1g6py59.png"
@@ -288,6 +305,8 @@ export default function HomeScreen() {
             symbol="ETH"
             price="$3,462.64"
             change={-0.25}
+            labelStyle = {colorScheme.text}
+
           />
           <CryptoItem
             icon="https://static-00.iconduck.com/assets.00/skycoin-cryptocurrency-icon-512x512-tay18qnk.png"
@@ -295,6 +314,8 @@ export default function HomeScreen() {
             symbol="SKY"
             price="$194.29"
             change={-0.07}
+            labelStyle = {colorScheme.text}
+
           />
           <CryptoItem
             icon="https://static-00.iconduck.com/assets.00/dogecoin-cryptocurrency-icon-512x512-z7jjg89f.png"
@@ -302,6 +323,8 @@ export default function HomeScreen() {
             symbol="DOGE"
             price="$0.33702"
             change={6.0}
+            labelStyle = {colorScheme.text}
+
           />
           <CryptoItem
             icon="https://static-00.iconduck.com/assets.00/xrp-cryptocurrency-icon-512x512-lzdikk94.png"
@@ -309,6 +332,8 @@ export default function HomeScreen() {
             symbol="XRP"
             price="$2.3312"
             change={1.57}
+            labelStyle = {colorScheme.text}
+
           />
           <CryptoItem
             icon="https://static-00.iconduck.com/assets.00/okcash-cryptocurrency-icon-512x512-f0ys97ea.png"
@@ -316,6 +341,8 @@ export default function HomeScreen() {
             symbol="OK"
             price="$101,810.47"
             change={5.36}
+            labelStyle = {colorScheme.text}
+
           />
           <CryptoItem
             icon="https://static-00.iconduck.com/assets.00/stellar-cryptocurrency-icon-512x512-qas2sh98.png"
@@ -323,6 +350,8 @@ export default function HomeScreen() {
             symbol="STR"
             price="$101,810.47"
             change={5.36}
+            labelStyle = {colorScheme.text}
+
           />
         </ScrollView>
       </View>
