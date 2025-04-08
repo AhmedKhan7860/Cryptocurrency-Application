@@ -89,16 +89,6 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   </View>
 );
 
-const MobileStatusBar = () => (
-  <View style={styles.statusBar}>
-    <Text style={styles.statusTime}>9:14</Text>
-    <View style={styles.statusIcons}>
-      <Icon name="wifi" size={14} color="white" />
-      <Icon name="bar-chart" size={14} color="white" />
-      <Icon name="battery" size={14} color="white" />
-    </View>
-  </View>
-);
 
 const TransactionSuccess = () => {
   const theme = useColorScheme();
@@ -106,7 +96,6 @@ const TransactionSuccess = () => {
 
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
-      <MobileStatusBar />
     <View style={styles.content}>
       <SuccessIcon />
       <Text style={[styles.title, {color: colors.text}]}>Transaction success</Text>
