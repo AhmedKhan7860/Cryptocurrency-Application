@@ -3,14 +3,18 @@ import { TextInput, TouchableOpacity, SafeAreaView, Image } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const theme = useColorScheme();    
+  const colors = Colors[theme ?? 'light'] || Colors.light;
 
+  
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{backgroundColor: colors.background}}>
       <ThemedView className="flex-1 px-6 pt-5">
         {/* Logo and Title Section */}
         <ThemedView className="flex-row items-center mb-8">

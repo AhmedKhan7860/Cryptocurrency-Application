@@ -1,7 +1,8 @@
 import { SafeAreaView, TouchableOpacity, View, Text, FlatList } from "react-native";
 import { AntDesign } from "@expo/vector-icons"
 import { useCallback, useState } from "react";
-
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
 export default function BuyScreen() {
     const [expanded, setExpanded] = useState(false);
@@ -35,10 +36,11 @@ export default function BuyScreen() {
         setSelectedCrypto(value);
         setExpanded(false);
     };
-
+    const theme = useColorScheme();
+    const colorScheme = Colors[theme ?? 'light'] || Colors.light;
 
     return(
-        <SafeAreaView className="flex-1 bg-black">
+        <SafeAreaView className="flex-1" style={{backgroundColor: colorScheme.background}}>
             <View className="flex-1 flex-row">
                 <View className="p-2 w-[55%]">
 
@@ -82,21 +84,21 @@ export default function BuyScreen() {
                     {/* Limit Order */}
                     <View className="top-6">
                         <TouchableOpacity className="border-2 border-stone-800 w-[161px] h-[35px] rounded-lg justify-center items-center mb-6 flex-row gap-5">
-                            <Text className="text-white text-[13px] font-bold">{selectOrder}</Text>
-                            <AntDesign name={expanded ? 'caretup' : "caretdown"} color='white'/>
+                            <Text className="text-[13px] font-bold" style ={{color: colorScheme.text}}>{selectOrder}</Text>
+                            <AntDesign name={expanded ? 'caretup' : "caretdown"} color= {colorScheme.text}/>
                         </TouchableOpacity>
                     </View>
 
                     {/* Price */}
                     <View className="top-6 border-2 border-stone-800 w-[161px] h-[55px] rounded-lg">
                         <Text className="p-2 text-gray-400 text-[10px] font-bold">Price USDT</Text>
-                        <Text className="p-2 bottom-2 text-white text-[16px] font-bold">101,810.47</Text>
+                        <Text className="p-2 bottom-2 text-[16px] font-bold" style ={{color: colorScheme.text}}>101,810.47</Text>
                     </View>
 
                     {/* Amount */}
                     <View className="p-2 justify-center items-center top-14 border-2 border-stone-800 w-[161px] h-[45px] rounded-lg flex-row gap-14">
                         <Text className="text-gray-400 font-bold">Amount</Text>
-                        <Text className="text-white font-bold">BTC</Text>
+                        <Text className="font-bold" style = {{color: colorScheme.text}}>BTC</Text>
                     </View>
 
                     {/* Percentage Bar */}
@@ -111,22 +113,22 @@ export default function BuyScreen() {
                     {/* Total */}
                     <View className="p-2 justify-center items-center mt-10 border-2 border-stone-800 w-[161px] h-[45px] rounded-lg flex-row gap-14">
                         <Text className="text-gray-400 font-bold">Total</Text>
-                        <Text className="text-white font-bold">USDT</Text>
+                        <Text className="font-bold" style={{color: colorScheme.text}}>USDT</Text>
                     </View>
                     
                     {/* Information */}
                     <View className="flex-col mt-10 w-[200px]">
                         <View className="flex-row justify-between">
                             <Text className="text-gray-400 font-bold">Available</Text>
-                            <Text className="text-white font-bold">205.12 USDT</Text>
+                            <Text className="font-bold" style ={{color: colorScheme.text}}>205.12 USDT</Text>
                         </View>
                         <View className="flex-row justify-between">
                             <Text className="text-gray-400 font-bold">Max Buy</Text>
-                            <Text className="text-white font-bold">0.00001 BTC</Text>
+                            <Text className="font-bold" style ={{color: colorScheme.text}}>0.00001 BTC</Text>
                         </View>
                         <View className="flex-row justify-between">
                             <Text className="text-gray-400 font-bold">Fee</Text>
-                            <Text className="text-white font-bold">Free</Text>
+                            <Text className="font-bold" style ={{color: colorScheme.text}}>Free</Text>
                         </View>
                     </View>
 
@@ -148,7 +150,7 @@ export default function BuyScreen() {
                     {orderBookData.map((item, index) => (
                         <View key={index} className="flex-row justify-between py-2">
                             <Text className="text-red-400">{item.price}</Text>
-                            <Text className="text-white">{item.amount}</Text>
+                            <Text style ={{color: colorScheme.text}}>{item.amount}</Text>
                         </View>
                     ))}
                     </View>

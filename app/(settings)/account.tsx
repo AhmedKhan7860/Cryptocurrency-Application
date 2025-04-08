@@ -14,9 +14,21 @@ import {
   LogIn,
   GlobeLock,
 } from "lucide-react-native";
+import React , { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScrollView } from "react-native";
 import { useUser } from "@clerk/clerk-expo";
 import { SignOutButton } from "@/components/SignOutButton";
+import {useRouter} from "expo-router";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+import {useFocusEffect} from "@react-navigation/native";
+
+
+const THEME_KEY = "user-theme";
+type Theme = "light" | "dark";
+
+
 type SettingItemProps = {
   icon: React.ReactNode;
   label: string;
@@ -57,11 +69,47 @@ function SettingItem({
 
 export default function AccountScreen() {
   const { user } = useUser();
+  const router = useRouter();
 
+ 
+  const [theme, setTheme] = useState<Theme>("light");
+
+  
+
+  useEffect(() => {
+    const fetchTheme = async () => {
+      const savedTheme = await AsyncStorage.getItem(THEME_KEY);
+      if (savedTheme) {
+        setTheme(savedTheme as Theme);
+      }
+    };
+
+    fetchTheme();
+  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchTheme = async () => {
+        const savedTheme = (await AsyncStorage.getItem(THEME_KEY)) as Theme | null;
+        if (savedTheme) {
+          setTheme(savedTheme);
+        }
+      };
+
+      fetchTheme();
+    }, [])
+  );
+  const handleThemeChange = async () => {
+    router.push("/theme");
+  };
+  
+  const colors = theme === "dark"  ? Colors.dark : Colors.light;
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={{backgroundColor:colors.background}}>
       <View style={styles.header}>
-        <Text style={styles.title}>Account</Text>
+        <Pressable onPress={() => router.push("/")}>
+          <Text style={[styles.backText, {color: colors.text}]}>←</Text>
+        </Pressable>
+        <Text style={[styles.title,{color:colors.text}]}>Account</Text>
       </View>
 
       <Pressable style={styles.profileSection}>
@@ -89,11 +137,7 @@ export default function AccountScreen() {
           label="Currency"
           value="USD"
         />
-        <SettingItem
-          icon={<Globe2 size={20} color="#151415" />}
-          label="Language"
-          value="English"
-        />
+        
         <SettingItem
           icon={<HelpCircle size={20} color="#151415" />}
           label="Support"
@@ -112,7 +156,9 @@ export default function AccountScreen() {
         <SettingItem
           icon={<Moon size={20} color="#151415" />}
           label="Theme"
-          value="Automatic"
+          value={theme === "light" ? "Light" : "Dark"}
+          onPress = {handleThemeChange}
+          
         />
       </View>
       <View style={styles.section}>
@@ -133,24 +179,13 @@ export default function AccountScreen() {
           onPress={() => console.log("Navigate to Change Password screen")}
         />
         <SettingItem
-          icon={<ScanEye size={20} color="#151415" />}
-          label="Biometric Authentication"
-          showSwitch={true}
-          showChevron={false}
-        />
-
-        <SettingItem
-          icon={<LogIn size={20} color="#151415" />}
-          label="Login Activity"
-          onPress={() => console.log("Navigate to Login Activity")}
-        />
-        <SettingItem
           icon={<Shield size={20} color="#151415" />}
           label="Security Alerts"
           showSwitch={true}
           showChevron={false}
         />
-        <SignOutButton />
+      <SignOutButton className="bg-red-500 px-10 py-2 rounded-lg shadow-sm active:opacity-80 mt-4 mb-2 mx-auto" />
+
       </View>
     </ScrollView>
   );
@@ -244,6 +279,10 @@ const styles = StyleSheet.create({
   },
   valueText: {
     fontSize: 16,
+    color: "#FFFFFF",
+  },
+  backText: {
+    fontSize: 24,
     color: "#FFFFFF",
   },
 });
