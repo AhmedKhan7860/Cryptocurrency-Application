@@ -3,6 +3,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import {useColorScheme} from '@/hooks/useColorScheme';
+import {Colors} from '@/constants/Colors';
+
+
+
 
 type TransactionDetailsProps = {
   fromAmount: string;
@@ -84,23 +89,16 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   </View>
 );
 
-const MobileStatusBar = () => (
-  <View style={styles.statusBar}>
-    <Text style={styles.statusTime}>9:14</Text>
-    <View style={styles.statusIcons}>
-      <Icon name="wifi" size={14} color="white" />
-      <Icon name="bar-chart" size={14} color="white" />
-      <Icon name="battery" size={14} color="white" />
-    </View>
-  </View>
-);
 
-const TransactionSuccess = () => (
-  <SafeAreaView style={styles.container}>
-    <MobileStatusBar />
+const TransactionSuccess = () => {
+  const theme = useColorScheme();
+  const colors = Colors[theme ?? 'light'] || Colors.light;
+
+  return (
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
     <View style={styles.content}>
       <SuccessIcon />
-      <Text style={styles.title}>Transaction success</Text>
+      <Text style={[styles.title, {color: colors.text}]}>Transaction success</Text>
       <TransactionDetails
         fromAmount="1,000"
         fromCurrency="USDT"
@@ -113,12 +111,13 @@ const TransactionSuccess = () => (
         <Text style={styles.buttonText}>Done</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.secondaryButton}>
-        <Text style={styles.buttonText}>View Transactions</Text>
+        <Text style={[styles.buttonText, {color: colors.text}]}>View Transactions</Text>
       </TouchableOpacity>
     </View>
     <View style={styles.homeIndicator} />
   </SafeAreaView>
-);
+  );
+};
 
 export default TransactionSuccess;
 

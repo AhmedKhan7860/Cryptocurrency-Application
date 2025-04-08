@@ -1,21 +1,25 @@
 import {  View, Text, TextInput, Modal, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useState } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
-
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 export default function ConvertScreen(){
   const [usdtAmount, setUsdtAmount] = useState('1,000');
   const [btcAmount, setBtcAmount] = useState('0.01061533');
   const [isModalVisible, setModalVisible] = useState(false);
 
+  const theme = useColorScheme();
   // Mock conversion rate (you can replace this with an API call)
   const conversionRate = 101810.47;
+  
 
+  const colors = Colors[theme ?? 'light'] || Colors.light;
   return (
     <TouchableWithoutFeedback onPress={()=>{
       Keyboard.dismiss();
     }}>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background } ]}>
         {/* Header */}
         <Text style={styles.header}>Convert</Text>
 
